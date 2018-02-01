@@ -79,6 +79,11 @@ FusionEKF::FusionEKF() {
 FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
+  // if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+  //   return;
+  // }
+
+
   /*****************************************************************************
    *  Initialization
    ****************************************************************************/
@@ -114,9 +119,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     // done initializing, no need to predict or update
     is_initialized_ = true;
-    return;
-  }
-  if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
     return;
   }
 
@@ -161,7 +163,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   ekf_.Predict();
 
-  cout << "Predict Done" << endl;
+  // cout << "Predict Done" << endl;
   /*****************************************************************************
    *  Update
    ****************************************************************************/
@@ -173,18 +175,20 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    cout << "RADAR: " << R_radar_ << endl;
+    // cout << "RADAR: " << R_radar_ << endl;
     ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
     ekf_.R_ = R_radar_;
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
-    cout << "LASER" << endl;
+    // cout << "LASER" << endl;
     ekf_.H_ = H_laser_;
     ekf_.R_ = R_laser_;
     ekf_.Update(measurement_pack.raw_measurements_);
   }
 
-  // print the output
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
+  // // print the output
+  std::cout << " 1: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
+  
+  // cout << "x_ = " << ekf_.x_ << endl;
+  // cout << "P_ = " << ekf_.P_ << endl;
 }
