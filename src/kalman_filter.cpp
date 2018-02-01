@@ -22,18 +22,14 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 
 void KalmanFilter::Predict() {
   std::cout << "KalmanFilter::Predict" << std::endl;
-  std::cout << "F=" << F_ << std::endl;
-  std::cout << "x=" << x_ << std::endl;
-  std::cout << "P=" << P_ << std::endl;
-  std::cout << "Q=" << Q_ << std::endl;
+  // std::cout << "F=" << F_ << std::endl;
+  // std::cout << "x=" << x_ << std::endl;
+  // std::cout << "P=" << P_ << std::endl;
+  // std::cout << "Q=" << Q_ << std::endl;
 
-  std::cout << "calculate x" << std::endl;
 	x_ = F_ * x_;
-  std::cout << "calculate F.transpose()" << std::endl;
 	MatrixXd Ft = F_.transpose();
-  std::cout << "calculate P" << std::endl;
 	P_ = F_ * P_ * Ft + Q_;
-  std::cout << "done with predict" << std::endl;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
