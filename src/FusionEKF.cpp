@@ -128,8 +128,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   float dt_3 = dt_2 * dt;
   float dt_4 = dt_3 * dt;
 
-	float noise_ax = 5;
-	float noise_ay = 5;
+	float noise_ax = 9;
+	float noise_ay = 9;
 
 
 	//1. Modify the F matrix so that the time is integrated
@@ -167,8 +167,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
-    ekf_.Update(measurement_pack.raw_measurements_);
+    // ekf_.Update(measurement_pack.raw_measurements_);
   }
 
   // print the output
