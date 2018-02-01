@@ -43,7 +43,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   float rho = sqrt(px * px + py * py);
   float theta = atan2(py, px); 
-  float rho_dot = (px * vx + py * vy) / rho;
+  // float rho_dot = (px * vx + py * vy) / rho;
 
   while (theta > M_PI) {
     theta -= 2 * M_PI;
@@ -52,6 +52,15 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   while (theta < -M_PI) {
     theta += 2 * M_PI;
   }
+
+  float rho_dot;
+  if (rho < 0.0001) {
+    rho_dot = (px * vx + py * vy) / 0.0001;
+  } else {
+    rho_dot = (px * vx + py * vy) / rho;
+  }
+
+
 
   std::cout << "rho: " << rho << " theta: " << theta << " rho_dot " << rho_dot << std::endl;
 
