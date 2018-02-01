@@ -28,8 +28,44 @@ void KalmanFilter::Predict() {
 	P_ = F_ * P_ * Ft + Q_;
 }
 
+void KalmanFilter::UpdateEKF(const VectorXd &z) {
+  Tools tools;
+  
+  std::cout << "KalmanFilter::UpdateEKF" << std::endl;
+  std::cout << "z=" << z << std::endl;
+  
+  float px = x_(0);
+  float py = x_(1);
+  float vx = x_(2);
+  float vy = x_(3);
+  
+  // Calculate h(x) manually
+
+  float rho = sqrt(px * px + py * py);
+  float theta = atan2(py, px); 
+  float rho_dot = (px * vx + py * vy) / rho;
+  
+  while (theta > M_PI) {
+    theta -= 2 * M_PI;
+  }
+
+  while (theta < -M_PI) {
+    theta += 2 * M_PI;
+  }
+
+  std::cout << "rho: " << rho << " theta: " << theta << " rho_dot " << rho_dot << std::endl;
+
+  VectorXd h_x = VectorXd(3);
+  h_x << rho, theta, rho_dot;
+
+  // Calculate y = z - h(x)
+	VectorXd y = z - h_x;
+  Update(y);
+}
+
 void KalmanFilter::Update(const VectorXd &z) {
   std::cout << "KalmanFilter::Update" << std::endl;
+  std::cout << z << std::endl;
 	VectorXd z_pred = H_ * x_;
 	VectorXd y = z - z_pred;
 	MatrixXd Ht = H_.transpose();
@@ -45,27 +81,3 @@ void KalmanFilter::Update(const VectorXd &z) {
 	P_ = (I - K * H_) * P_;
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  Tools tools;
-  
-  std::cout << "KalmanFilter::UpdateEKF" << std::endl;
-  std::cout << "z=" << z << std::endl;
-  /**
-  TODO:
-    * update the state by using Extended Kalman Filter equations
-  */
-
-  // Calculate h(x) manually
-
-  float rho = sqrt(x_(0) * x_(0) + x_(1) * x_(1));
-  float theta = atan(x_(1) / x_(0)); // check for valid range
-  float rho_dot = (x_(0) * x_(2) + x_(1) * x_(3)) / rho;
-
-  VectorXd h_x = VectorXd(3);
-  h_x << rho, theta, rho_dot;
-
-  // Calculate y = z - h(x)
-
-	VectorXd y = z - h_x;
-  Update(y);
-}
