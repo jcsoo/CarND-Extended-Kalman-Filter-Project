@@ -22,10 +22,6 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 
 void KalmanFilter::Predict() {
   std::cout << "KalmanFilter::Predict" << std::endl;
-  // std::cout << "F=" << F_ << std::endl;
-  // std::cout << "x=" << x_ << std::endl;
-  // std::cout << "P=" << P_ << std::endl;
-  // std::cout << "Q=" << Q_ << std::endl;
 
 	x_ = F_ * x_;
 	MatrixXd Ft = F_.transpose();
@@ -71,5 +67,5 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   // Calculate y = z - h(x)
 
 	VectorXd y = z - h_x;
-  UpdateEKF(y);
+  Update(y);
 }

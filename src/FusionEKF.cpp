@@ -49,6 +49,10 @@ FusionEKF::FusionEKF() {
 			  0, 0, 1000, 0,
 			  0, 0, 0, 1000;
 
+	//measurement covariance
+	ekf_.R_ = MatrixXd(2, 2);
+	ekf_.R_ << 0.0225, 0,
+			  0, 0.0225;
 
 	//measurement matrix
 	ekf_.H_ = MatrixXd(2, 4);
@@ -104,8 +108,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
-      ekf_.R_ << R_laser_;
-      ekf_.H_ << H_laser_;
     }
     cout << ekf_.x_ << endl;
 
@@ -113,6 +115,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     is_initialized_ = true;
     return;
   }
+  if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+    return;
+  }
+
 
   /*****************************************************************************
    *  Prediction
@@ -154,6 +160,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   ekf_.Predict();
 
+  cout << "Predict Done" << endl;
   /*****************************************************************************
    *  Update
    ****************************************************************************/
@@ -165,14 +172,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    ekf_.R_ << R_radar_;
-    ekf_.H_ << tools.CalculateJacobian(ekf_.x_);
-
+    cout << "RADAR: " << R_radar_ << endl;
+    ekf_.R_ = R_radar_;
+    ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+    cout << "RADAR Done" << endl;
   } else {
-    ekf_.R_ << R_laser_;
-    ekf_.H_ << H_laser_;
-    // ekf_.Update(measurement_pack.raw_measurements_);
+    cout << "LASER" << endl;
+    ekf_.R_ = R_laser_;
+    ekf_.H_ = H_laser_;
+  	ekf_.H_ << 1, 0, 0, 0,
+  			  0, 1, 0, 0;    
+    ekf_.Update(measurement_pack.raw_measurements_);
+    cout << "LASER Done" << endl;
   }
 
   // print the output
