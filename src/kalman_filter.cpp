@@ -53,35 +53,23 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   Tools tools;
   
   std::cout << "KalmanFilter::UpdateEKF" << std::endl;
-  std::cout << "x=" << x_ << std::endl;
   std::cout << "z=" << z << std::endl;
   /**
   TODO:
     * update the state by using Extended Kalman Filter equations
   */
-  MatrixXd Hj = tools.CalculateJacobian(x_);
-  std::cout << "Hj=" << Hj << std::endl;
-	VectorXd z_pred = Hj * x_;
-  std::cout << "z_pred=" << z_pred << std::endl;  
-	VectorXd y = z - z_pred;
-  std::cout << "y=" << y << std::endl;  
-	MatrixXd Ht = H_.transpose();
-  std::cout << "Ht=" << Ht << std::endl;  
-	MatrixXd S = H_ * P_ * Ht + R_;
-  std::cout << "S=" << S << std::endl;  
-	MatrixXd Si = S.inverse();
-  std::cout << "Si=" << Si << std::endl;  
-	MatrixXd PHt = P_ * Ht;
-  std::cout << "PHt=" << PHt << std::endl;  
-	MatrixXd K = PHt * Si;  
-  std::cout << "K=" << K << std::endl;  
-	//new estimate
-	x_ = x_ + (K * y);
-  std::cout << "x=" << K << std::endl;  
-	long x_size = x_.size();
-  std::cout << "x_size=" << x_size << std::endl;  
-	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  std::cout << "I=" << I << std::endl;  
-	P_ = (I - K * H_) * P_;  
-  std::cout << "P=" << P_ << std::endl;  
+
+  // Calculate h(x) manually
+
+  float rho = sqrt(x_(0) * x_(0) + x_(1) * x_(1));
+  float theta = atan(x_(1) / x_(0)); // check for valid range
+  float rho_dot = (x_(0) * x_(2) + x_(1) * x_(3)) / rho;
+
+  VectorXd h_x = VectorXd(3);
+  h_x << rho, theta, rho_dot;
+
+  // Calculate y = z - h(x)
+
+	VectorXd y = z - h_x;
+  UpdateEKF(y);
 }
