@@ -79,9 +79,9 @@ FusionEKF::FusionEKF() {
 FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
-  // if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-  //   return;
-  // }
+  if (measurement_pack.sensor_type_ != MeasurementPackage::RADAR) {
+    return;
+  }
 
 
   /*****************************************************************************
