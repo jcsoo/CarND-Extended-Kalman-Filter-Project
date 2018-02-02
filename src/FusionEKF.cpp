@@ -73,9 +73,9 @@ FusionEKF::FusionEKF() {
 FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
-  if (measurement_pack.sensor_type_ != MeasurementPackage::RADAR) {
-    return;
-  }
+  // if (measurement_pack.sensor_type_ != MeasurementPackage::RADAR) {
+  //   return;
+  // }
 
 
   /*****************************************************************************
@@ -153,7 +153,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   ekf_.Predict();
-  std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
+  // std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
 
   // cout << "Predict Done" << endl;
   /*****************************************************************************
