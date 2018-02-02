@@ -92,15 +92,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     const VectorXd& raw = measurement_pack.raw_measurements_;
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+      std::cout << " z: " << raw(0) << " " << raw(1) << " " << raw(2) << std::endl;
       ekf_.x_ = tools.to_cartesian(raw);      
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       ekf_.x_ << raw(0), raw(1), 0, 0;
     }
-    cout << ekf_.x_ << endl;
   	previous_timestamp_ = measurement_pack.timestamp_;
     // done initializing, no need to predict or update
     is_initialized_ = true;
+    std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
+    VectorXd p = tools.to_polar(ekf_.x_);
+    std::cout << " r: " << p(0) << " " << p(1) << " " << p(2) << endl;
+    std::cout << endl;
     return;
   }
 
@@ -109,14 +113,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    *  Prediction
    ****************************************************************************/
 
-  cout << "Predict" << endl;
-
 	//compute the time elapsed between the current and previous measurements
 
 	float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;	//dt - expressed in seconds
 	previous_timestamp_ = measurement_pack.timestamp_;
-	
-  cout << "DT: " << dt << endl;
 
   float dt_2 = dt * dt;
   float dt_3 = dt_2 * dt;
@@ -151,13 +151,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Update the process noise covariance matrix.
      * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
-  cout << "Q_ = " << ekf_.Q_ << endl;
+
   ekf_.Predict();
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
-  cout << "Predict Done" << endl;
+  std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
 
   // cout << "Predict Done" << endl;
   /*****************************************************************************
@@ -181,7 +177,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     R = R_laser_;
   }
   ekf_.Update(z, H, Hx, R);
-
+  std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
+  std::cout << " P:\n" << ekf_.P_ << endl;
+  std::cout << endl;
   // // print the output
   
   // cout << "x_ = " << ekf_.x_ << endl;

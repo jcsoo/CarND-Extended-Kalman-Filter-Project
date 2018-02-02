@@ -32,32 +32,56 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 	const float EPSILON = 0.0001;
-	MatrixXd Hj = MatrixXd::Zero(3, 4);
 
-	// recover state parameters
+	MatrixXd Hj(3,4);
+	//recover state parameters
 	float px = x_state(0);
 	float py = x_state(1);
 	float vx = x_state(2);
 	float vy = x_state(3);
 
-  // pre-compute a set of terms to avoid repeated calculation	
-	float c1 = px * px + py * py;
+	//pre-compute a set of terms to avoid repeated calculation
+	float c1 = px*px+py*py;
 	float c2 = sqrt(c1);
-	float c3 = c1 * c2;
+	float c3 = (c1*c2);
 
-	if (c2 >= EPSILON) {
-		//compute the Jacobian matrix
-		float h11 = px / c2;
-		float h12 = py / c2;
-		float h21 = -py / c1;
-		float h22 = px / c1;
-		float h31 = py * (vx * py - vy * px ) / c3;
-		float h32 = px * (vy * px - vx * py) / c3;
-
-		Hj << h11, h12,   0,   0,
-		      h21, h22,   0,   0,
-			  h31, h32, h11, h11;
+	//check division by zero
+	if(fabs(c1) < 0.0001){
+		cout << "CalculateJacobian () - Error - Division by Zero" << endl;
+		return Hj;
 	}
+
+	//compute the Jacobian matrix
+	Hj << (px/c2), (py/c2), 0, 0,
+		  -(py/c1), (px/c1), 0, 0,
+		  py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
+
+
+
+// 	// recover state parameters
+// 	float px = x_state(0);
+// 	float py = x_state(1);
+// 	float vx = x_state(2);
+// 	float vy = x_state(3);
+
+//   // pre-compute a set of terms to avoid repeated calculation	
+// 	float c1 = px * px + py * py;
+// 	float c2 = sqrt(c1);
+// 	float c3 = c1 * c2;
+
+// 	if (c2 >= EPSILON) {
+// 		//compute the Jacobian matrix
+// 		float h11 = px / c2;
+// 		float h12 = py / c2;
+// 		float h21 = -py / c1;
+// 		float h22 = px / c1;
+// 		float h31 = py * (vx * py - vy * px ) / c3;
+// 		float h32 = px * (vy * px - vx * py) / c3;
+
+// 		Hj << h11, h12,   0,   0,
+// 		      h21, h22,   0,   0,
+// 			  h31, h32, h11, h11;
+// 	}
       
 	return Hj;
 }
@@ -83,7 +107,7 @@ VectorXd Tools::to_polar(const VectorXd& c) {
 VectorXd Tools::to_cartesian(const VectorXd& p) {
 	VectorXd c(4);
 
-	std::cout << "to_cartesian: " << p << std::endl;
+	// std::cout << "to_cartesian: " << p << std::endl;
 
 	float rho = p(0);
 	float theta = p(1);
@@ -95,6 +119,6 @@ VectorXd Tools::to_cartesian(const VectorXd& p) {
 	float vy = rho_dot * sin(theta);
 
 	c << px, py, vx, vy;
-	std::cout << "c" << c << std::endl;
+	// std::cout << "c" << c << std::endl;
 	return c;
 }
