@@ -8,8 +8,6 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
 
-Tools tools;
-
 /*
  * Constructor.
  */
@@ -99,7 +97,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       std::cout << " z: " << raw(0) << " " << raw(1) << " " << raw(2) << std::endl;
-      ekf_.x_ = tools.to_cartesian(raw);      
+      ekf_.x_ = ToCartesian(raw);      
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       ekf_.x_ << raw(0), raw(1), 0, 0;
@@ -108,7 +106,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // done initializing, no need to predict or update
     is_initialized_ = true;
     std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
-    VectorXd p = tools.to_polar(ekf_.x_);
+    VectorXd p = ToPolar(ekf_.x_);
     std::cout << " r: " << p(0) << " " << p(1) << " " << p(2) << endl;
     std::cout << endl;
     return;
@@ -174,8 +172,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    H = tools.CalculateJacobian(tools.to_cartesian(z));
-    Hx = tools.to_polar(x);
+    H = CalculateJacobian(ToCartesian(z));
+    Hx = ToPolar(x);
     R = R_radar_;
   } else {
     H = H_laser_;

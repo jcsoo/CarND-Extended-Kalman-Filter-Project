@@ -5,11 +5,8 @@ using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
 
-Tools::Tools() {}
 
-Tools::~Tools() {}
-
-VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
+VectorXd CalculateRMSE(const vector<VectorXd> &estimations,
                               const vector<VectorXd> &ground_truth) {
 
 	VectorXd rmse(4);
@@ -30,7 +27,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 	return rmse;
 }
 
-MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
+MatrixXd CalculateJacobian(const VectorXd& x_state) {
 	const float EPSILON = 0.0001;
 
 	MatrixXd Hj(3,4);
@@ -59,7 +56,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 	return Hj;
 }
 
-VectorXd Tools::to_polar(const VectorXd& c) {
+VectorXd ToPolar(const VectorXd& c) {
 	const float EPSILON = 0.0001;
 	
 	VectorXd p(3);
@@ -77,10 +74,10 @@ VectorXd Tools::to_polar(const VectorXd& c) {
 	return p;	
 }
 
-VectorXd Tools::to_cartesian(const VectorXd& p) {
+VectorXd ToCartesian(const VectorXd& p) {
 	VectorXd c(4);
 
-	// std::cout << "to_cartesian: " << p << std::endl;
+	// std::cout << "ToCartesian: " << p << std::endl;
 
 	float rho = p(0);
 	float theta = p(1);
