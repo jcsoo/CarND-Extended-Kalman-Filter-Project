@@ -57,6 +57,8 @@ FusionEKF::FusionEKF() {
 
   ekf_.I_ = MatrixXd::Identity(4, 4);
 
+  ekf_.noise_ax_ = 9;
+  ekf_.noise_ay_ = 9;
 	// noise_ax = 5;
 	// noise_ay = 5;
 
@@ -111,35 +113,35 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;
 	previous_timestamp_ = measurement_pack.timestamp_;
 
-  float dt_2 = dt * dt;
-  float dt_3 = dt_2 * dt;
-  float dt_4 = dt_3 * dt;
+  // float dt_2 = dt * dt;
+  // float dt_3 = dt_2 * dt;
+  // float dt_4 = dt_3 * dt;
 
-	float noise_ax = 9;
-	float noise_ay = 9;
+	// float noise_ax = 9;
+	// float noise_ay = 9;
 
-	// 1. Modify the F matrix so reflect the relative time step
+	// // 1. Modify the F matrix so reflect the relative time step
 
-  ekf_.F_(0, 2) = dt;
-  ekf_.F_(1, 3) = dt;
+  // ekf_.F_(0, 2) = dt;
+  // ekf_.F_(1, 3) = dt;
 
-	//2. Set the process covariance matrix Q
+	// //2. Set the process covariance matrix Q
 
-  float q11 = dt_4 * noise_ax / 4.0;
-  float q13 = dt_3 * noise_ax / 2.0;
-  float q22 = dt_4 * noise_ay / 4.0;
-  float q24 = dt_3 * noise_ay / 2.0;
-  float q31 = q13;
-  float q33 = dt_2 * noise_ax;
-  float q42 = q22;
-  float q44 = dt_2 * noise_ay;
+  // float q11 = dt_4 * noise_ax / 4.0;
+  // float q13 = dt_3 * noise_ax / 2.0;
+  // float q22 = dt_4 * noise_ay / 4.0;
+  // float q24 = dt_3 * noise_ay / 2.0;
+  // float q31 = q13;
+  // float q33 = dt_2 * noise_ax;
+  // float q42 = q22;
+  // float q44 = dt_2 * noise_ay;
 
-	ekf_.Q_ = MatrixXd(4, 4);
-  ekf_.Q_ <<
-      q11,   0, q13,   0,
-        0, q22,   0, q24,
-      q31,   0, q33,   0,
-        0, q42,   0, q44;
+	// ekf_.Q_ = MatrixXd(4, 4);
+  // ekf_.Q_ <<
+  //     q11,   0, q13,   0,
+  //       0, q22,   0, q24,
+  //     q31,   0, q33,   0,
+  //       0, q42,   0, q44;
 
 
   /**
@@ -150,7 +152,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
 
-  ekf_.Predict();
+  ekf_.Predict(dt);
   // std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
 
   // cout << "Predict Done" << endl;

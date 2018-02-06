@@ -17,9 +17,37 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in, MatrixXd
   Q_ = Q_in;
 }
 
-void KalmanFilter::Predict() {
+void KalmanFilter::Predict(float dt) {
   // std::cout << "KalmanFilter::Predict" << std::endl;
   // std::cout << "x: " << x_ << std::endl;
+
+  float dt_2 = dt * dt;
+  float dt_3 = dt_2 * dt;
+  float dt_4 = dt_3 * dt;
+	// 1. Modify the F matrix so reflect the relative time step
+
+  F_(0, 2) = dt;
+  F_(1, 3) = dt;
+
+	//2. Set the process covariance matrix Q
+
+  float q11 = dt_4 * noise_ax_ / 4.0;
+  float q13 = dt_3 * noise_ax_ / 2.0;
+  float q22 = dt_4 * noise_ay_ / 4.0;
+  float q24 = dt_3 * noise_ay_ / 2.0;
+  float q31 = q13;
+  float q33 = dt_2 * noise_ax_;
+  float q42 = q22;
+  float q44 = dt_2 * noise_ay_;
+
+	Q_ = MatrixXd(4, 4);
+  Q_ <<
+      q11,   0, q13,   0,
+        0, q22,   0, q24,
+      q31,   0, q33,   0,
+        0, q42,   0, q44;
+
+
 	x_ = F_ * x_;
 	P_ = F_ * P_ * F_.transpose() + Q_;
 }

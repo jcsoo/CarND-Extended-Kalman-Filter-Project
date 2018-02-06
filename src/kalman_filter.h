@@ -22,11 +22,8 @@ public:
   // identity matrix
   Eigen::MatrixXd I_;
 
-  // // measurement matrix
-  // Eigen::MatrixXd H_;
-
-  // // measurement covariance matrix
-  // Eigen::MatrixXd R_;
+  float noise_ax_;
+  float noise_ay_;
 
   /**
    * Constructor
@@ -54,7 +51,7 @@ public:
    * using the process model
    * @param delta_T Time between k and k+1 in s
    */
-  void Predict();
+  void Predict(float dt);
 
   /**
    * Updates the state by using standard Kalman Filter equations
