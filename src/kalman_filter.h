@@ -22,6 +22,11 @@ public:
   // identity matrix
   Eigen::MatrixXd I_;
 
+  Eigen::MatrixXd R_laser_;
+  Eigen::MatrixXd R_radar_;
+
+  Eigen::MatrixXd H_laser_;
+
   float noise_ax_;
   float noise_ay_;
 
@@ -63,8 +68,8 @@ public:
    * Updates the state by using Extended Kalman Filter equations
    * @param z The measurement at k+1
    */
-  void UpdateEKF(const Eigen::VectorXd &z);
-
+  void UpdateRadar(const Eigen::Vector3d &z);
+  void UpdateLaser(const Eigen::Vector2d &z);
 };
 
 #endif /* KALMAN_FILTER_H_ */

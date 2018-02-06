@@ -2,6 +2,7 @@
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using Eigen::Vector2d;
 
 // Please note that the Eigen library does not initialize 
 // VectorXd or MatrixXd objects with zeros upon creation.
@@ -18,18 +19,19 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in, MatrixXd
 }
 
 void KalmanFilter::Predict(float dt) {
-  // std::cout << "KalmanFilter::Predict" << std::endl;
-  // std::cout << "x: " << x_ << std::endl;
+  // Predict the next state using the current state, dt, and F matrix.
 
-  float dt_2 = dt * dt;
-  float dt_3 = dt_2 * dt;
-  float dt_4 = dt_3 * dt;
 	// 1. Modify the F matrix so reflect the relative time step
 
   F_(0, 2) = dt;
   F_(1, 3) = dt;
 
-	//2. Set the process covariance matrix Q
+	// 2. Set the process covariance matrix Q
+
+  float dt_2 = dt * dt;
+  float dt_3 = dt_2 * dt;
+  float dt_4 = dt_3 * dt;
+  
 
   float q11 = dt_4 * noise_ax_ / 4.0;
   float q13 = dt_3 * noise_ax_ / 2.0;
@@ -75,3 +77,14 @@ void KalmanFilter::Update(const VectorXd &z, const MatrixXd &H, const VectorXd &
 	P_ = (I_ - K * H) * P_;
 }
 
+void KalmanFilter::UpdateRadar(const Vector3d &z) {
+  MatrixXd H = CalculateJacobian(ToCartesian(z));
+  MatrixXd Hx = ToPolar(x_);
+  Update(z, H, Hx, R_radar_);
+}
+
+void KalmanFilter::UpdateLaser(const Vector2d &z) {
+  MatrixXd H = H_laser_;
+  MatrixXd Hx = H * x_;
+  Update(z, H, Hx, R_laser_);
+}
