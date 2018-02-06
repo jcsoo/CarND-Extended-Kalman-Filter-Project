@@ -1,6 +1,9 @@
 #include <iostream>
 #include "tools.h"
 
+using Eigen::Vector3d;
+using Eigen::Vector4d;
+
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
@@ -30,37 +33,47 @@ VectorXd CalculateRMSE(const vector<VectorXd> &estimations,
 MatrixXd CalculateJacobian(const VectorXd& x_state) {
 	const float EPSILON = 0.0001;
 
-	MatrixXd Hj(3,4);
+	MatrixXd Hj = MatrixXd::Zero(3, 4);
+
 	//recover state parameters
+
 	float px = x_state(0);
 	float py = x_state(1);
 	float vx = x_state(2);
 	float vy = x_state(3);
 
-	//pre-compute a set of terms to avoid repeated calculation
-	float c1 = px*px+py*py;
+	// Pre-compute a set of terms to avoid repeated calculation
+
+	float c1 = px * px + py * py;
 	float c2 = sqrt(c1);
 	float c3 = (c1*c2);
 
-	//check division by zero
+	// Check division by zero
+
 	if(fabs(c1) < 0.0001){
 		cout << "CalculateJacobian () - Error - Division by Zero" << endl;
 		return Hj;
 	}
 
-	//compute the Jacobian matrix
-	Hj << (px/c2), (py/c2), 0, 0,
-		  -(py/c1), (px/c1), 0, 0,
-		  py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
+	// Compute the Jacobian matrix
+
+	float h11 =  px / c2;
+	float h12 =  py / c2;
+	float h21 = -py / c1;
+	float h22 =  px / c1;
+	float h31 =  py * (vx * py - vy * px) / c3;
+	float h32 =  px * (px * vy - py * vx) / c3;
+
+	Hj << h11, h12,   0,   0,
+	      h21, h22,   0,   0,
+		  h31, h32, h11, h12;
 
 	return Hj;
 }
 
-VectorXd ToPolar(const VectorXd& c) {
+Vector3d ToPolar(const Vector4d& c) {
 	const float EPSILON = 0.0001;
 	
-	VectorXd p(3);
-
 	float px = c(0);
 	float py = c(1);
 	float vx = c(2);
@@ -70,15 +83,10 @@ VectorXd ToPolar(const VectorXd& c) {
     float theta = atan2(py, px);
 	float rho_dot = (rho > EPSILON) ? (px * vx + py * vy) / rho : 0.0;
 
-	p << rho, theta, rho_dot;
-	return p;	
+	return Vector3d(rho, theta, rho_dot);
 }
 
-VectorXd ToCartesian(const VectorXd& p) {
-	VectorXd c(4);
-
-	// std::cout << "ToCartesian: " << p << std::endl;
-
+Vector4d ToCartesian(const Vector3d& p) {
 	float rho = p(0);
 	float theta = p(1);
 	float rho_dot = p(2);
@@ -88,7 +96,5 @@ VectorXd ToCartesian(const VectorXd& p) {
 	float vx = rho_dot * cos(theta);
 	float vy = rho_dot * sin(theta);
 
-	c << px, py, vx, vy;
-	// std::cout << "c" << c << std::endl;
-	return c;
+	return Vector4d(px, py, vx, vy);
 }
