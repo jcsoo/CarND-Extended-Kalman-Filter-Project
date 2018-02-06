@@ -16,16 +16,13 @@ FusionEKF::FusionEKF() {
 
   previous_timestamp_ = 0;
 
-  /**
-  TODO:
-    * Finish initializing the FusionEKF.
-    * Set the process and measurement noises
-  */
 
-	//create a 4D state vector, we don't know yet the values of the x state
+  // Initialize EKF
+
+	// Create a 4D state vector, we don't know yet the values of the x state
 	ekf_.x_ = VectorXd(4);
 
-	//state covariance matrix P
+	// state covariance matrix P
 	ekf_.P_ = MatrixXd(4, 4);
 
 
@@ -70,10 +67,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   auto sensor_type = measurement_pack.sensor_type_;
   auto z = measurement_pack.raw_measurements_;
 
-  // if (measurement_pack.sensor_type_ != MeasurementPackage::RADAR) {
-  //   return;
-  // }
-
   // Check for timestamp discontinuities and restart if detected.
 
   if (abs(measurement_pack.timestamp_ - previous_timestamp_) > 100000) {
@@ -115,32 +108,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   } else if (sensor_type == MeasurementPackage::LASER) {
     ekf_.UpdateLaser(z);
   }
-
-  // const VectorXd& z = measurement_pack.raw_measurements_;
-  // const VectorXd& x = ekf_.x_;
-  // MatrixXd H;
-  // MatrixXd Hx;
-  // MatrixXd R;
-
-
-  // if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-  //   H = CalculateJacobian(ToCartesian(z));
-  //   Hx = ToPolar(x);
-  //   R = R_radar_;
-  // } else {
-  //   H = H_laser_;
-  //   Hx = H * x;
-  //   R = R_laser_;
-  // }
-  // ekf_.Update(z, H, Hx, R);
-
-  // std::cout << " x: " << ekf_.x_(0) << " " << ekf_.x_(1) << " " << ekf_.x_(2) << " " << ekf_.x_(3) << std::endl;
-  // std::cout << " P:\n" << ekf_.P_ << endl;
-  // std::cout << endl;
-  // // // print the output
   
-  // cout << "x_ = " << ekf_.x_ << endl;
-  // cout << "P_ = " << ekf_.P_ << endl;
-
   previous_timestamp_ = timestamp;
 }

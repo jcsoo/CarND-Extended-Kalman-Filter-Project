@@ -61,17 +61,11 @@ void KalmanFilter::Update(const VectorXd &z, const MatrixXd &H, const VectorXd &
 	const MatrixXd S = H * PHt + R;
 	const MatrixXd K = PHt * S.inverse();
 	VectorXd y = z - Hx;
+
   if (y.size() == 3) { 
+    // Normalize phi to be in range
     y(1) = atan2(sin(y(1)), cos(y(1)));    
   }
-
-  // std::cout << " z: " << z(0) << " " << z(1) << " " << z(2) << std::endl;  
-  // std::cout << "Hx: " << Hx(0) << " " << Hx(1) << " " << Hx(2) << std::endl;  
-  // std::cout << " y: " << y(0) << " " << y(1) << " " << y(2) << std::endl;  
-  // std::cout << " K:\n" << K << std::endl;  
-
-  // VectorXd ky = K * y;
-  // std::cout << "Ky: " << ky(0) << " " << ky(1) << " " << ky(2) << " " << ky(3) << std::endl;  
 
 	x_ = x_ + (K * y);
 	P_ = (I_ - K * H) * P_;
